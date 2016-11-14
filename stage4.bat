@@ -27,5 +27,9 @@ if ERRORLEVEL 1 (
 )
 
 :continue
+rem run stuff you want after here
 echo thing
+rem if using cd detect, after we export the registry key and after the sfc has finished, we import the original registry key
+::reg import temp.reg
+rem pause for debug
 pause
