@@ -45,7 +45,8 @@ title xpSFC watcher
 
 rem winlogon.exe if it is there
 rem INFO: No tasks running with the specified critera.
-
+rem http://stackoverflow.com/questions/8177695/how-to-wait-for-a-process-to-terminate-to-execute-another-process-in-batch-file
+rem http://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
 :loop
 tasklist /fi "WINDOWTITLE eq windows file protection" | find /i "winlogon" > nul
 if ERRORLEVEL 1 (
