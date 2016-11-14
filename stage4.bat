@@ -23,6 +23,8 @@ echo mounting image...
 PortableWinCDEmu-4.0.exe "XP Pro SP3 (32).iso" rem mount
 rem delay for four seconds for the image to mount
 ping -n 5 localhost >nul
+rem close the setup window if autorun opens it
+taskkill /im setup.exe /fi "WINDOWTITLE eq Welcome to Microsoft Windows XP" >nul
 echo.
 
 rem get drive letter and edit registry
@@ -70,6 +72,7 @@ rem restore the registry key we exported at the begining
 echo updating registry
 reg import temp.reg >nul
 PortableWinCDEmu-4.0.exe /unmountall
+rem del temp.reg >nul
 
 rem send an email on completion
 REM SwithMail.exe /s /x "fostatek.xml"
