@@ -75,6 +75,17 @@ reg import temp.reg >nul
 PortableWinCDEmu-4.0.exe /unmountall
 rem del temp.reg >nul
 
+chkdsk %SystemDrive%
+if /i not %ERRORLEVEL%==0 (
+	echo CHKDSK: Errors found on %SystemDrive%.
+	fsutil dirty set %SystemDrive%
+	REM schtasks /create /tn "long-shutdown" /ru SYSTEM /sc ONSTART /tr "%cd%\task.bat" /RL HIGHEST
+	REM %SystemRoot%\System32\shutdown /r /f
+) else (
+	echo CHKDSK: No errors found on %SystemDrive%.
+	REM shutdown /r /f
+)
+
 rem send an email on completion
 REM SwithMail.exe /s /x "fostatek.xml"
 echo.
