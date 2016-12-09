@@ -10,67 +10,63 @@ if not "%WIN_VER%"=="Microsoft Windows XP" (
 	exit
 )
 
-rem export registry keys
+:: export registry keys
 echo make registry backup
 reg export "HKLM\Software\Microsoft\Windows\CurrentVersion\Setup" temp.reg >nul
 echo.
 
-rem install wincdemu drivers and mount image
+:: install wincdemu drivers and mount image
 echo installing drivers...
 PortableWinCDEmu-4.0.exe /install
 echo.
 echo mounting image...
 PortableWinCDEmu-4.0.exe "XP Pro SP3 (32).iso" rem mount
-rem delay for four seconds for the image to mount
+:: delay for four seconds for the image to mount
 ping -n 5 localhost >nul
-rem close the setup window if autorun opens it
+:: close the setup window if autorun opens it
 taskkill /im setup.exe /fi "WINDOWTITLE eq Welcome to Microsoft Windows XP" >nul
 echo.
 
-rem get drive letter and edit registry
-REM echo check drive assignment...
+:: get drive letter and edit registry
 PortableWinCDEmu-4.0.exe /check "XP Pro SP3 (32).iso"
 set cddrive=%=exitcodeascii%
 REM echo %=exitcodeascii%
 echo updating registry
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Setup" /v SourcePath /d %cddrive%:\ /f >nul
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Setup" /v ServicePackSourcePath /d %cddrive%:\ /f >nul
-REM pause
 
-rem start the scan process
+:: start the scan process
 sfc /scannow
 REM ping -n 1 localhost >nul rem delay for one second for the process to show up in tasklist
 
 title xpSFC watcher
-
-rem winlogon.exe if it is there
-rem INFO: No tasks running with the specified critera.
-rem http://stackoverflow.com/questions/8177695/how-to-wait-for-a-process-to-terminate-to-execute-another-process-in-batch-file
-rem http://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
+echo.
+echo DO NOT CLOSE THIS WINDOW
+echo its still running...
+:: winlogon.exe if it is there
+:: INFO: No tasks running with the specified critera.
+:: http://stackoverflow.com/questions/8177695/how-to-wait-for-a-process-to-terminate-to-execute-another-process-in-batch-file
+:: http://stackoverflow.com/questions/162291/how-to-check-if-a-process-is-running-via-a-batch-script
 :loop
 tasklist /fi "WINDOWTITLE eq windows file protection" | find /i "winlogon" > nul
 if ERRORLEVEL 1 (
-	rem this is what happens when it is not running
-	rem echo not running?
+	:: this is what happens when it is not running
 	rem echo %errorlevel%
-	cls
+	REM cls
 	goto continue
 ) else (
-	rem this is what happens when it is running
-	cls
-	echo.
-	echo DO NOT CLOSE THIS WINDOW
-	echo its still running...
-	rem er0
+	:: this is what happens when it is running
+	REM cls
 	rem echo %errorlevel%
 	ping localhost -n 5 > nul
 	goto loop
 )
 
 :continue
-rem this is what happens after it runs
-rem restore the registry key we exported at the begining
-echo updating registry
+:: this is what happens after it runs
+:: restore the registry key we exported at the begining
+echo.
+echo updating registry...
 reg import temp.reg >nul
 PortableWinCDEmu-4.0.exe /unmountall
 rem del temp.reg >nul
@@ -86,7 +82,7 @@ if /i not %ERRORLEVEL%==0 (
 	REM shutdown /r /f
 )
 
-rem send an email on completion
+:: send an email on completion
 REM SwithMail.exe /s /x "fostatek.xml"
 echo.
 pause
