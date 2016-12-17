@@ -1,4 +1,7 @@
 @echo off
+:: Windows XP ISO location
+set xp_iso=XP Pro SP3 (32).iso
+
 pushd %~dp0 2>NUL
 
 for /f "tokens=3*" %%i IN ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName ^| find "ProductName"') DO set WIN_VER=%%i %%j
@@ -20,7 +23,7 @@ echo installing drivers...
 PortableWinCDEmu-4.0.exe /install
 echo.
 echo mounting image...
-PortableWinCDEmu-4.0.exe "XP Pro SP3 (32).iso" rem mount
+PortableWinCDEmu-4.0.exe "%xp_iso%" rem mount
 :: delay for four seconds for the image to mount
 ping -n 5 localhost >nul
 :: close the setup window if autorun opens it
@@ -28,7 +31,7 @@ taskkill /im setup.exe /fi "WINDOWTITLE eq Welcome to Microsoft Windows XP" >nul
 echo.
 
 :: get drive letter and edit registry
-PortableWinCDEmu-4.0.exe /check "XP Pro SP3 (32).iso"
+PortableWinCDEmu-4.0.exe /check "%xp_iso%"
 set cddrive=%=exitcodeascii%
 REM echo %=exitcodeascii%
 echo updating registry
