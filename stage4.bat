@@ -4,15 +4,28 @@ set xp_iso=XP Pro SP3 (32).iso
 
 pushd %~dp0 2>NUL
 
+:: detect Windows Version
 for /f "tokens=3*" %%i IN ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName ^| find "ProductName"') DO set WIN_VER=%%i %%j
-if not "%WIN_VER%"=="Microsoft Windows XP" (
-	echo.
-	echo only Microsoft Windows XP is supported. This is %win_ver%.
-	echo.
-	pause
-	exit
-)
+for /f "tokens=3*" %%i IN ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentVersion ^| FIND "CurrentVersion"') DO set WIN_VER_NUM=%%i
+REM if not "%WIN_VER%"=="Microsoft Windows XP" (
+	REM echo.
+	REM echo only Microsoft Windows XP is supported. This is %win_ver%.
+	REM echo.
+	REM pause
+	REM exit
+REM )
 
+:: Windows XP
+if %WIN_VER_NUM% leq 6.1 goto windowsxp
+:: Windows 7 and below
+if %WIN_VER_NUM% leq 6.1 goto legacy
+:: Windows 8 and above
+if %WIN_VER_NUM% geq 6.2 goto win8
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: WINDOWS XP
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:windowsxp
 :: export registry keys
 echo make registry backup
 reg export "HKLM\Software\Microsoft\Windows\CurrentVersion\Setup" temp.reg >nul
@@ -73,7 +86,43 @@ echo updating registry...
 reg import temp.reg >nul
 PortableWinCDEmu-4.0.exe /unmountall
 rem del temp.reg >nul
+goto checkdisk
 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: WINDOWS VISTA and WINDOWS 7
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:legacy
+sfc /scannow
+goto checkdisk
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:: WINDOWS 8+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:win8
+dism /online /NoRestart /cleanup-image /scanhealth
+if not %ERRORLEVEL%==0 (
+	:: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
+	Dism /Online /NoRestart /Cleanup-Image /RestoreHealth
+	if not %ERRORLEVEL%==0 (
+		echo DISM: There was an issue with the DISM repair.
+	) else (
+		echo DISM: Image repaired successfully.
+	)
+) else (
+	echo DISM: No image corruption detected.
+)
+
+sfc /scannow
+if not %ERRORLEVEL%==0 (
+	echo SFC: There was an issue with the SFC repair.
+) else (
+	echo SFC: SFC completed sucessfully.
+)
+
+goto checkdisk
+
+:checkdisk
+:: check disk
 chkdsk %SystemDrive%
 if /i not %ERRORLEVEL%==0 (
 	echo CHKDSK: Errors found on %SystemDrive%.
