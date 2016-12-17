@@ -16,7 +16,7 @@ REM if not "%WIN_VER%"=="Microsoft Windows XP" (
 REM )
 
 :: Windows XP
-if %WIN_VER_NUM% leq 6.1 goto windowsxp
+if %WIN_VER_NUM% equ 5.1 goto windowsxp
 :: Windows 7 and below
 if %WIN_VER_NUM% leq 6.1 goto legacy
 :: Windows 8 and above
