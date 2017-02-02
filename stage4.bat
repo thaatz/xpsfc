@@ -118,23 +118,24 @@ if not %ERRORLEVEL%==0 (
 ) else (
 	echo SFC: SFC completed sucessfully.
 )
-
 goto checkdisk
 
 :checkdisk
 :: check disk
-chkdsk %SystemDrive%
-if /i not %ERRORLEVEL%==0 (
-	echo CHKDSK: Errors found on %SystemDrive%.
-	fsutil dirty set %SystemDrive%
-	REM schtasks /create /tn "long-shutdown" /ru SYSTEM /sc ONSTART /tr "%cd%\task.bat" /RL HIGHEST
-	REM %SystemRoot%\System32\shutdown /r /f
-) else (
-	echo CHKDSK: No errors found on %SystemDrive%.
-	REM shutdown /r /f
-)
+:: set the drive as dirty and then we will run the check when we restart
+fsutil dirty set %SystemDrive%
+:: chkdsk %SystemDrive%
+:: if /i not %ERRORLEVEL%==0 (
+:: 	echo CHKDSK: Errors found on %SystemDrive%.
+:: 	fsutil dirty set %SystemDrive%
+:: 	REM schtasks /create /tn "long-shutdown" /ru SYSTEM /sc ONSTART /tr "%cd%\task.bat" /RL HIGHEST
+:: 	REM %SystemRoot%\System32\shutdown /r /f
+:: ) else (
+:: 	echo CHKDSK: No errors found on %SystemDrive%.
+:: 	REM shutdown /r /f
+:: )
 
 :: send an email on completion
 REM SwithMail.exe /s /x "fostatek.xml"
 echo.
-pause
+REM pause
