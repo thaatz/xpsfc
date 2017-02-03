@@ -74,7 +74,7 @@ if ERRORLEVEL 1 (
 	:: this is what happens when it is running
 	REM cls
 	rem echo %errorlevel%
-	ping localhost -n 5 > nul
+	ping localhost -n 6 > nul
 	goto loop
 )
 
