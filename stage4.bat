@@ -144,17 +144,26 @@ goto checkdisk
 :: WINDOWS 8+
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :win8
-dism /online /NoRestart /cleanup-image /scanhealth
+REM dism /online /NoRestart /cleanup-image /scanhealth
+REM if not %ERRORLEVEL%==0 (
+	REM :: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
+	REM Dism /Online /NoRestart /Cleanup-Image /RestoreHealth
+	REM if not %ERRORLEVEL%==0 (
+		REM echo DISM: There was an issue with the DISM repair.
+	REM ) else (
+		REM echo DISM: Image repaired successfully.
+	REM )
+REM ) else (
+	REM echo DISM: No image corruption detected.
+REM )
+
+:: use restorehealth instead since it scans and repairs whereas scanhealth only scans
+:: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
+dism /online /NoRestart /cleanup-image /restorehealth
 if not %ERRORLEVEL%==0 (
-	:: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
-	Dism /Online /NoRestart /Cleanup-Image /RestoreHealth
-	if not %ERRORLEVEL%==0 (
-		echo DISM: There was an issue with the DISM repair.
-	) else (
-		echo DISM: Image repaired successfully.
-	)
+	echo DISM: There was an issue with the DISM repair.
 ) else (
-	echo DISM: No image corruption detected.
+	echo DISM: Sucessful.
 )
 
 sfc /scannow
