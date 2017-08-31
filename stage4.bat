@@ -201,6 +201,5 @@ fsutil dirty set %SystemDrive%
 :: 	REM shutdown /r /f
 :: )
 
-echo. >>"%xpsfclog%"
 echo.
 REM pause
