@@ -16,6 +16,8 @@ REM set xpsfclog=%userprofile%\desktop\xpsfc.log
 :: ----------------------------------------------------------------------------
 pushd %~dp0 2>NUL
 
+echo starting xpSFC on %date% at %time%>>"%xpsfclog%"
+
 :: detect Windows Version
 for /f "tokens=3*" %%i IN ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName ^| find "ProductName"') DO set WIN_VER=%%i %%j
 for /f "tokens=3*" %%i IN ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentVersion ^| FIND "CurrentVersion"') DO set WIN_VER_NUM=%%i
@@ -26,8 +28,6 @@ if %WIN_VER_NUM% equ 5.1 goto windowsxp
 if %WIN_VER_NUM% leq 6.1 goto legacy
 :: Windows 8 and above
 if %WIN_VER_NUM% geq 6.2 goto win8
-
-echo starting xpSFC on %date% at %time%>>"%xpsfclog%"
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: WINDOWS XP
