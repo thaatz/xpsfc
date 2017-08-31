@@ -8,6 +8,11 @@ set sfc_mode=folder
 set xp_iso=XP Pro SP3 (32).iso
 :: Windows XP i386 folder location (no quotes) (set this if you set the sfc mode to folder) (this is the root folder, not the i386 folder itself)
 set xpsource=%~dp0
+
+:: LOGGING
+:: for use with tronlite, set this to %tronlog%
+set xpsfclog=%tronlog%
+REM set xpsfclog=%userprofile%\desktop\xpsfc.log
 :: ----------------------------------------------------------------------------
 pushd %~dp0 2>NUL
 
@@ -21,6 +26,8 @@ if %WIN_VER_NUM% equ 5.1 goto windowsxp
 if %WIN_VER_NUM% leq 6.1 goto legacy
 :: Windows 8 and above
 if %WIN_VER_NUM% geq 6.2 goto win8
+
+echo starting xpSFC on %date% at %time%>>"%xpsfclog%"
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :: WINDOWS XP
@@ -161,15 +168,19 @@ REM )
 :: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
 dism /online /NoRestart /cleanup-image /restorehealth
 if not %ERRORLEVEL%==0 (
+	echo DISM: There was an issue with the DISM repair.>>"%xpsfclog%"
 	echo DISM: There was an issue with the DISM repair.
 ) else (
+	echo DISM: Sucessful.>>"%xpsfclog%"
 	echo DISM: Sucessful.
 )
 
 sfc /scannow
 if not %ERRORLEVEL%==0 (
+	echo SFC: There was an issue with the SFC repair.>>"%xpsfclog%"
 	echo SFC: There was an issue with the SFC repair.
 ) else (
+	echo SFC: SFC completed sucessfully.>>"%xpsfclog%"
 	echo SFC: SFC completed sucessfully.
 )
 goto checkdisk
@@ -190,5 +201,6 @@ fsutil dirty set %SystemDrive%
 :: 	REM shutdown /r /f
 :: )
 
+echo. >>"%xpsfclog%"
 echo.
 REM pause
