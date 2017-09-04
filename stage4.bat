@@ -164,17 +164,33 @@ REM ) else (
 	REM echo DISM: No image corruption detected.
 REM )
 
+:: use enabledelayedexpansion so that we can find the error level within the nested if statements
+setlocal enabledelayedexpansion
 :: use restorehealth instead since it scans and repairs whereas scanhealth only scans
 :: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
 dism /online /NoRestart /cleanup-image /restorehealth
 if not %ERRORLEVEL%==0 (
-	echo DISM: There was an issue with the DISM repair.>>"%xpsfclog%"
-	echo DISM: There was an issue with the DISM repair.
+	echo DISM: There was an issue with the DISM repair. Starting DISM component cleanup.>>"%xpsfclog%"
+	echo DISM: There was an issue with the DISM repair. Starting DISM component cleanup.
+	:: http://www.thewindowsclub.com/dism-fails-source-files-could-not-be-found
+	:: if the error was "DISM fails The source files could not be found", sometimes component cleanup can help fix the issue
+	dism /online /Cleanup-Image /StartComponentCleanup
+	dism /online /NoRestart /cleanup-image /restorehealth
+	REM echo !errorlevel!
+	if not !ERRORLEVEL!==0 (
+		echo DISM: DISM repair failed again. It is recommended that you visit the following link and try running DISM manually to resolve.>>"%xpsfclog%"
+		echo http://www.thewindowsclub.com/dism-fails-source-files-could-not-be-found>>"%xpsfclog%"
+		echo DISM: DISM repair failed again. It is recommended that you visit the following link and try running DISM manually to resolve.
+		echo http://www.thewindowsclub.com/dism-fails-source-files-could-not-be-found
+	) else (
+		echo DISM: Sucessful.>>"%xpsfclog%"
+		echo DISM: Sucessful.
+	)
 ) else (
 	echo DISM: Sucessful.>>"%xpsfclog%"
 	echo DISM: Sucessful.
 )
-
+REM debug pause
 sfc /scannow
 if not %ERRORLEVEL%==0 (
 	echo SFC: There was an issue with the SFC repair.>>"%xpsfclog%"
