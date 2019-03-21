@@ -6,7 +6,7 @@ This originally started out as a system file checking script for Windows XP, but
 It's like a doctor check up for your computer.
 also check the comments in the script
 
-##installation:
+## Installation:
 
 **On Windows XP**, put a windows xp sp3 iso file in the same directory as the script and name it winxpsp3.so
 or change it in the script.
