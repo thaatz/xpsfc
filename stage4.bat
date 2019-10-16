@@ -166,6 +166,17 @@ REM )
 
 :: use enabledelayedexpansion so that we can find the error level within the nested if statements
 setlocal enabledelayedexpansion
+
+:: run sfc /scannow before dism as per MS best practices
+sfc /scannow
+if not %ERRORLEVEL%==0 (
+	echo SFC: There was an issue with the SFC repair.>>"%xpsfclog%"
+	echo SFC: There was an issue with the SFC repair.
+) else (
+	echo SFC: SFC completed sucessfully.>>"%xpsfclog%"
+	echo SFC: SFC completed sucessfully.
+)
+
 :: use restorehealth instead since it scans and repairs whereas scanhealth only scans
 :: Add /LimitAccess flag to this command to prevent connecting to Windows Update for replacement files
 dism /online /NoRestart /cleanup-image /restorehealth
@@ -191,14 +202,6 @@ if not %ERRORLEVEL%==0 (
 	echo DISM: Sucessful.
 )
 REM debug pause
-sfc /scannow
-if not %ERRORLEVEL%==0 (
-	echo SFC: There was an issue with the SFC repair.>>"%xpsfclog%"
-	echo SFC: There was an issue with the SFC repair.
-) else (
-	echo SFC: SFC completed sucessfully.>>"%xpsfclog%"
-	echo SFC: SFC completed sucessfully.
-)
 goto checkdisk
 
 :checkdisk
